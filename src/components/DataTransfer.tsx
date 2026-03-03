@@ -2,6 +2,7 @@
 
 import { useCallback, useRef, useState } from "react";
 import { exportAllData, importAllData, ExportData } from "@/lib/storage";
+import { useLocale } from "@/hooks/useLocale";
 
 interface DataTransferProps {
   open: boolean;
@@ -12,6 +13,7 @@ export default function DataTransfer({ open, onClose }: DataTransferProps) {
   const fileRef = useRef<HTMLInputElement>(null);
   const [status, setStatus] = useState<"idle" | "success" | "error">("idle");
   const [message, setMessage] = useState("");
+  const { locale, setLocale, t } = useLocale();
 
   const handleExport = useCallback(() => {
     const data = exportAllData();
@@ -25,7 +27,7 @@ export default function DataTransfer({ open, onClose }: DataTransferProps) {
     a.click();
     URL.revokeObjectURL(url);
     setStatus("success");
-    setMessage("エクスポートしました");
+    setMessage(t("data.exportSuccess"));
     setTimeout(() => setStatus("idle"), 2000);
   }, []);
 
@@ -46,11 +48,11 @@ export default function DataTransfer({ open, onClose }: DataTransferProps) {
         }
         importAllData(data);
         setStatus("success");
-        setMessage("インポート完了。リロードします...");
+        setMessage(t("data.importSuccess"));
         setTimeout(() => window.location.reload(), 1000);
       } catch {
         setStatus("error");
-        setMessage("無効なファイルです");
+        setMessage(t("data.invalidFile"));
         setTimeout(() => setStatus("idle"), 3000);
       }
     };
@@ -73,10 +75,10 @@ export default function DataTransfer({ open, onClose }: DataTransferProps) {
         <div className="mx-auto mb-6 h-1 w-10 rounded-full bg-text-secondary/30" />
 
         <h2 className="text-lg font-bold text-text-primary mb-1">
-          データ管理
+          {t("data.title")}
         </h2>
         <p className="text-sm text-text-secondary mb-6">
-          他のデバイスへデータを移行できます
+          {t("data.subtitle")}
         </p>
 
         <div className="flex flex-col gap-3">
@@ -92,8 +94,8 @@ export default function DataTransfer({ open, onClose }: DataTransferProps) {
               </svg>
             </div>
             <div>
-              <p className="text-base font-semibold text-text-primary">エクスポート</p>
-              <p className="text-xs text-text-secondary">JSONファイルとして保存</p>
+              <p className="text-base font-semibold text-text-primary">{t("data.export")}</p>
+              <p className="text-xs text-text-secondary">{t("data.exportDesc")}</p>
             </div>
           </button>
 
@@ -109,10 +111,39 @@ export default function DataTransfer({ open, onClose }: DataTransferProps) {
               </svg>
             </div>
             <div>
-              <p className="text-base font-semibold text-text-primary">インポート</p>
-              <p className="text-xs text-text-secondary">JSONファイルから復元（上書き）</p>
+              <p className="text-base font-semibold text-text-primary">{t("data.import")}</p>
+              <p className="text-xs text-text-secondary">{t("data.importDesc")}</p>
             </div>
           </button>
+        </div>
+
+        {/* Language toggle */}
+        <div className="mt-5 rounded-2xl bg-surface-highlight px-5 py-4">
+          <p className="text-sm font-medium text-text-secondary mb-3">
+            {t("settings.language")}
+          </p>
+          <div className="flex rounded-xl overflow-hidden border border-border">
+            <button
+              onClick={() => setLocale("ja")}
+              className={`flex-1 py-2.5 text-sm font-medium transition-colors ${
+                locale === "ja"
+                  ? "bg-amber text-white"
+                  : "bg-bg-secondary text-text-secondary"
+              }`}
+            >
+              日本語
+            </button>
+            <button
+              onClick={() => setLocale("ko")}
+              className={`flex-1 py-2.5 text-sm font-medium transition-colors ${
+                locale === "ko"
+                  ? "bg-amber text-white"
+                  : "bg-bg-secondary text-text-secondary"
+              }`}
+            >
+              한국어
+            </button>
+          </div>
         </div>
 
         {status !== "idle" && (
@@ -135,7 +166,7 @@ export default function DataTransfer({ open, onClose }: DataTransferProps) {
           onClick={onClose}
           className="mt-5 w-full rounded-2xl border border-border py-3.5 text-base font-medium text-text-secondary active:opacity-70"
         >
-          閉じる
+          {t("common.close")}
         </button>
       </div>
     </div>

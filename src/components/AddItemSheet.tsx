@@ -3,6 +3,7 @@
 import { useState, useEffect, useMemo } from "react";
 import { TaskType, Category, Group } from "@/lib/storage";
 import BottomSheet from "./BottomSheet";
+import { useLocale } from "@/hooks/useLocale";
 
 type AddMode = "category" | "group" | "task";
 
@@ -62,6 +63,7 @@ export default function AddItemSheet({
   defaultParentGroupId,
   defaultMode = "task",
 }: AddItemSheetProps) {
+  const { t } = useLocale();
   const [mode, setMode] = useState<AddMode>(defaultMode);
   const [name, setName] = useState("");
   const [taskType, setTaskType] = useState<TaskType>("regular");
@@ -118,7 +120,7 @@ export default function AddItemSheet({
   };
 
   return (
-    <BottomSheet isOpen={isOpen} onClose={handleClose} title="追加">
+    <BottomSheet isOpen={isOpen} onClose={handleClose} title={t("addItem.title")}>
       {/* Mode selector */}
       <div className="flex gap-2 mb-5">
         {(["task", "category", "group"] as const).map((m) => (
@@ -135,10 +137,10 @@ export default function AddItemSheet({
             }`}
           >
             {m === "task"
-              ? "ミッション"
+              ? t("missions.mission")
               : m === "category"
-              ? "カテゴリ"
-              : "グループ"}
+              ? t("common.category")
+              : t("common.group")}
           </button>
         ))}
       </div>
@@ -151,10 +153,10 @@ export default function AddItemSheet({
           onChange={(e) => setName(e.target.value)}
           placeholder={
             mode === "category"
-              ? "カテゴリ名"
+              ? t("addItem.categoryName")
               : mode === "group"
-              ? "グループ名"
-              : "ミッション名"
+              ? t("addItem.groupName")
+              : t("addItem.missionName")
           }
           className="w-full rounded-xl border border-border bg-bg-secondary px-4 py-3.5 text-base text-text-primary placeholder:text-text-secondary/50 focus:border-amber focus:outline-none"
           autoFocus
@@ -164,7 +166,7 @@ export default function AddItemSheet({
         {(mode === "group" || mode === "task") && (
           <div>
             <label className="block text-xs font-medium text-text-secondary mb-1.5">
-              カテゴリ
+              {t("common.category")}
             </label>
             <select
               value={categoryId}
@@ -175,7 +177,7 @@ export default function AddItemSheet({
               }}
               className="w-full rounded-xl border border-border bg-bg-secondary px-4 py-3 text-base text-text-primary focus:border-amber focus:outline-none [color-scheme:dark]"
             >
-              <option value="">未分類</option>
+              <option value="">{t("common.uncategorized")}</option>
               {categories.map((c) => (
                 <option key={c.id} value={c.id}>
                   {c.name}
@@ -189,14 +191,14 @@ export default function AddItemSheet({
         {mode === "group" && categoryId && groupOptions.length > 0 && (
           <div>
             <label className="block text-xs font-medium text-text-secondary mb-1.5">
-              親グループ
+              {t("addItem.parentGroup")}
             </label>
             <select
               value={parentGroupId}
               onChange={(e) => setParentGroupId(e.target.value)}
               className="w-full rounded-xl border border-border bg-bg-secondary px-4 py-3 text-base text-text-primary focus:border-amber focus:outline-none [color-scheme:dark]"
             >
-              <option value="">なし（トップレベル）</option>
+              <option value="">{t("addItem.parentGroupNone")}</option>
               {groupOptions.map((g) => (
                 <option key={g.id} value={g.id}>
                   {g.label}
@@ -210,14 +212,14 @@ export default function AddItemSheet({
         {mode === "task" && categoryId && groupOptions.length > 0 && (
           <div>
             <label className="block text-xs font-medium text-text-secondary mb-1.5">
-              グループ
+              {t("common.group")}
             </label>
             <select
               value={groupId}
               onChange={(e) => setGroupId(e.target.value)}
               className="w-full rounded-xl border border-border bg-bg-secondary px-4 py-3 text-base text-text-primary focus:border-amber focus:outline-none [color-scheme:dark]"
             >
-              <option value="">グループなし</option>
+              <option value="">{t("common.noGroup")}</option>
               {groupOptions.map((g) => (
                 <option key={g.id} value={g.id}>
                   {g.label}
@@ -231,7 +233,7 @@ export default function AddItemSheet({
         {mode === "task" && (
           <div>
             <label className="block text-xs font-medium text-text-secondary mb-1.5">
-              タイプ
+              {t("common.type")}
             </label>
             <div className="flex rounded-xl overflow-hidden border border-border">
               <button
@@ -268,7 +270,7 @@ export default function AddItemSheet({
           }
           className="w-full rounded-xl bg-amber py-3.5 text-base font-semibold text-white transition-colors hover:bg-amber-dark disabled:opacity-40 mt-2"
         >
-          追加する
+          {t("common.addAction")}
         </button>
 
         <div className="h-10" />

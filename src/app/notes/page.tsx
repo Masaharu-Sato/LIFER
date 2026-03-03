@@ -3,6 +3,8 @@
 import { useState, useRef, useCallback, useEffect } from "react";
 import { loadNotes, saveNotes, type Note } from "@/lib/storage";
 import { useNotes } from "@/hooks/useNotes";
+import { useLocale } from "@/hooks/useLocale";
+import { getDateGroup as getDateGroupI18n } from "@/lib/i18n";
 import { useEdgeSwipeBack } from "@/hooks/useEdgeSwipeBack";
 import { NoteCell } from "@/components/notes/NoteCell";
 import { FolderCell } from "@/components/notes/FolderCell";
@@ -23,17 +25,8 @@ function createNoteDirect(folderId?: string): string {
 
 /* ── Date grouping ── */
 
-function getDateGroup(updatedAt: string): string {
-  const d = new Date(updatedAt);
-  const now = new Date();
-  const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-  const noteDay = new Date(d.getFullYear(), d.getMonth(), d.getDate());
-  const diff = Math.floor((today.getTime() - noteDay.getTime()) / 86400000);
-  if (diff === 0) return "今日";
-  if (diff === 1) return "昨日";
-  if (diff < 7) return "過去7日間";
-  if (diff < 30) return "過去30日間";
-  return d.toLocaleDateString("ja-JP", { year: "numeric", month: "long" });
+function getDateGroup(updatedAt: string, locale: "ja" | "ko" = "ja"): string {
+  return getDateGroupI18n(updatedAt, locale);
 }
 
 function sortNotes(notes: Note[]): Note[] {
@@ -42,11 +35,11 @@ function sortNotes(notes: Note[]): Note[] {
   );
 }
 
-function groupByDate(notes: Note[]): { label: string; notes: Note[] }[] {
+function groupByDate(notes: Note[], locale: "ja" | "ko" = "ja"): { label: string; notes: Note[] }[] {
   const sorted = sortNotes(notes);
   const groups: { label: string; notes: Note[] }[] = [];
   for (const n of sorted) {
-    const label = getDateGroup(n.updatedAt);
+    const label = getDateGroup(n.updatedAt, locale);
     const last = groups[groups.length - 1];
     if (last && last.label === label) {
       last.notes.push(n);
@@ -59,7 +52,7 @@ function groupByDate(notes: Note[]): { label: string; notes: Note[] }[] {
 
 /* ── Search bar ── */
 
-function SearchBar({ value, onChange }: { value: string; onChange: (v: string) => void }) {
+function SearchBar({ value, onChange, placeholder }: { value: string; onChange: (v: string) => void; placeholder?: string }) {
   return (
     <div className="px-4 py-2">
       <div className="flex items-center gap-2 rounded-[10px] notes-search-bg px-3 py-[9px]">
@@ -67,7 +60,7 @@ function SearchBar({ value, onChange }: { value: string; onChange: (v: string) =
           <circle cx="11" cy="11" r="8" /><line x1="21" y1="21" x2="16.65" y2="16.65" />
         </svg>
         <input type="text" value={value} onChange={(e) => onChange(e.target.value)}
-          placeholder="検索"
+          placeholder={placeholder}
           className="flex-1 bg-transparent text-[17px] outline-none notes-font"
           style={{ color: "var(--notes-primary)" }} />
         {value && (
@@ -86,24 +79,26 @@ function SearchBar({ value, onChange }: { value: string; onChange: (v: string) =
 /* ── Note list with date groups ── */
 
 function NoteListGrouped({
-  notes, onOpen, onDelete, onPin, onMove,
+  notes, onOpen, onDelete, onPin, onMove, locale, pinnedLabel,
 }: {
   notes: Note[];
   onOpen: (id: string) => void;
   onDelete: (id: string) => void;
   onPin: (id: string) => void;
   onMove: (id: string) => void;
+  locale: "ja" | "ko";
+  pinnedLabel: string;
 }) {
   const pinned = sortNotes(notes.filter((n) => n.isPinned));
   const unpinned = notes.filter((n) => !n.isPinned);
-  const groups = groupByDate(unpinned);
+  const groups = groupByDate(unpinned, locale);
 
   return (
     <>
       {pinned.length > 0 && (
         <>
           <p className="text-[13px] font-semibold notes-font px-1 mb-2 mt-2"
-            style={{ color: "var(--notes-secondary)" }}>ピン固定</p>
+            style={{ color: "var(--notes-secondary)" }}>{pinnedLabel}</p>
           {pinned.map((n) => (
             <NoteCell key={n.id} id={n.id} title={n.title} body={n.body}
               updatedAt={n.updatedAt} isPinned={n.isPinned}
@@ -138,6 +133,7 @@ export default function NotesPage() {
     deleteNote, pinNote, moveNote,
     addFolder, renameFolder, deleteFolder,
   } = useNotes();
+  const { locale, t } = useLocale();
 
   const [view, setView] = useState<ViewMode>("root");
   const [dir, setDir] = useState<"f" | "b">("f");
@@ -270,18 +266,18 @@ export default function NotesPage() {
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
               <polyline points="15 18 9 12 15 6" />
             </svg>
-            <span className="text-[17px] notes-font">メモ</span>
+            <span className="text-[17px] notes-font">{t("notes.title")}</span>
           </button>
         </nav>
 
         <div className="px-4 pt-6 pb-1">
           <h1 className="text-[34px] font-bold tracking-tight notes-font"
             style={{ color: "var(--notes-primary)" }}>
-            {folder?.name || "フォルダ"}
+            {folder?.name || t("notes.folderDefault")}
           </h1>
         </div>
 
-        <SearchBar value={search} onChange={setSearch} />
+        <SearchBar value={search} onChange={setSearch} placeholder={t("common.search")} />
 
         {filtered.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-24" style={{ color: "var(--notes-tertiary)" }}>
@@ -290,7 +286,7 @@ export default function NotesPage() {
               <polyline points="14 2 14 8 20 8" />
               <line x1="16" y1="13" x2="8" y2="13" /><line x1="16" y1="17" x2="8" y2="17" />
             </svg>
-            <p className="text-[17px]">{search ? "見つかりませんでした" : "メモなし"}</p>
+            <p className="text-[17px]">{search ? t("notes.notFound") : t("notes.noNotes")}</p>
           </div>
         ) : (
           <div className="flex-1 px-4 mt-1">
@@ -304,14 +300,14 @@ export default function NotesPage() {
             ) : (
               <NoteListGrouped notes={filtered}
                 onOpen={openNote} onDelete={handleDelete} onPin={handlePin}
-                onMove={(id) => setMoveTarget(id)} />
+                onMove={(id) => setMoveTarget(id)} locale={locale} pinnedLabel={t("notes.pinned")} />
             )}
           </div>
         )}
 
         <div className="sticky bottom-[calc(env(safe-area-inset-bottom,0px)+4.5rem)] flex items-center justify-between px-5 py-3">
           <p className="text-[13px] notes-font" style={{ color: "var(--notes-tertiary)" }}>
-            {folderNotes.length}件のメモ
+            {t("notes.noteCount", { count: folderNotes.length })}
           </p>
           <button onClick={() => createNote(activeFolderId || undefined)}
             className="flex items-center justify-center w-[44px] h-[44px] active:opacity-50"
@@ -351,16 +347,16 @@ export default function NotesPage() {
       style={{ transform: "translateZ(0)", overflowX: "hidden", touchAction: "pan-y" }} key="root">
       <div className="px-4 pt-14 pb-1">
         <h1 className="text-[34px] font-bold tracking-tight notes-font"
-          style={{ color: "var(--notes-primary)" }}>メモ</h1>
+          style={{ color: "var(--notes-primary)" }}>{t("notes.title")}</h1>
       </div>
 
-      <SearchBar value={search} onChange={setSearch} />
+      <SearchBar value={search} onChange={setSearch} placeholder={t("common.search")} />
 
       {searchResults ? (
         <div className="flex-1 px-4 mt-1">
           {searchResults.length === 0 ? (
             <div className="flex flex-col items-center justify-center py-24" style={{ color: "var(--notes-tertiary)" }}>
-              <p className="text-[17px]">見つかりませんでした</p>
+              <p className="text-[17px]">{t("notes.notFound")}</p>
             </div>
           ) : (
             searchResults.map((n) => (
@@ -377,7 +373,7 @@ export default function NotesPage() {
           {folders.length > 0 && (
             <>
               <p className="text-[13px] font-semibold notes-font px-1 mb-2 mt-2"
-                style={{ color: "var(--notes-secondary)" }}>フォルダ</p>
+                style={{ color: "var(--notes-secondary)" }}>{t("notes.folders")}</p>
               {folders.map((f) => (
                 <FolderCell key={f.id} folder={f}
                   noteCount={notes.filter((n) => n.folderId === f.id).length}
@@ -392,11 +388,11 @@ export default function NotesPage() {
             <div className="mt-2">
               {folders.length > 0 && (
                 <p className="text-[13px] font-semibold notes-font px-1 mb-2"
-                  style={{ color: "var(--notes-secondary)" }}>未分類</p>
+                  style={{ color: "var(--notes-secondary)" }}>{t("common.uncategorized")}</p>
               )}
               <NoteListGrouped notes={unfiledNotes}
                 onOpen={openNote} onDelete={handleDelete} onPin={handlePin}
-                onMove={(id) => setMoveTarget(id)} />
+                onMove={(id) => setMoveTarget(id)} locale={locale} pinnedLabel={t("notes.pinned")} />
             </div>
           )}
 
@@ -408,7 +404,7 @@ export default function NotesPage() {
                 <polyline points="14 2 14 8 20 8" />
                 <line x1="16" y1="13" x2="8" y2="13" /><line x1="16" y1="17" x2="8" y2="17" />
               </svg>
-              <p className="text-[17px]">メモなし</p>
+              <p className="text-[17px]">{t("notes.noNotes")}</p>
             </div>
           )}
         </div>
@@ -427,7 +423,7 @@ export default function NotesPage() {
             </svg>
           </button>
           <p className="text-[13px] notes-font" style={{ color: "var(--notes-tertiary)" }}>
-            {notes.length}件のメモ
+            {t("notes.noteCount", { count: notes.length })}
           </p>
         </div>
         <button onClick={() => createNote()}
@@ -456,10 +452,10 @@ export default function NotesPage() {
             style={{ background: "var(--notes-surface)" }}
             onClick={(e) => e.stopPropagation()}>
             <h3 className="text-[17px] font-bold text-center notes-font mb-4"
-              style={{ color: "var(--notes-primary)" }}>新規フォルダ</h3>
+              style={{ color: "var(--notes-primary)" }}>{t("notes.newFolder")}</h3>
             <input type="text" value={newFolderName}
               onChange={(e) => setNewFolderName(e.target.value)}
-              placeholder="フォルダ名" autoFocus
+              placeholder={t("notes.folderName")} autoFocus
               className="w-full text-[17px] bg-transparent rounded-lg px-3 py-2.5 outline-none notes-font"
               style={{ color: "var(--notes-primary)", border: "1px solid var(--notes-separator)", caretColor: "var(--color-amber)" }}
               onKeyDown={(e) => { if (e.key === "Enter") handleCreateFolder(); }} />
@@ -467,12 +463,12 @@ export default function NotesPage() {
               <button onClick={() => setShowNewFolder(false)}
                 className="flex-1 py-2.5 rounded-lg text-[17px] font-medium notes-font active:opacity-50"
                 style={{ color: "var(--color-amber)", background: "rgba(255,255,255,0.05)" }}>
-                キャンセル
+                {t("common.cancel")}
               </button>
               <button onClick={handleCreateFolder}
                 className="flex-1 py-2.5 rounded-lg text-[17px] font-bold notes-font active:opacity-50"
                 style={{ color: "#fff", background: "var(--color-amber)" }}>
-                作成
+                {t("notes.create")}
               </button>
             </div>
           </div>
@@ -487,10 +483,10 @@ export default function NotesPage() {
             style={{ background: "var(--notes-surface)" }}
             onClick={(e) => e.stopPropagation()}>
             <h3 className="text-[17px] font-bold text-center notes-font mb-4"
-              style={{ color: "var(--notes-primary)" }}>フォルダ名を変更</h3>
+              style={{ color: "var(--notes-primary)" }}>{t("notes.renameFolder")}</h3>
             <input type="text" value={renameName}
               onChange={(e) => setRenameName(e.target.value)}
-              placeholder="フォルダ名" autoFocus
+              placeholder={t("notes.folderName")} autoFocus
               className="w-full text-[17px] bg-transparent rounded-lg px-3 py-2.5 outline-none notes-font"
               style={{ color: "var(--notes-primary)", border: "1px solid var(--notes-separator)", caretColor: "var(--color-amber)" }}
               onKeyDown={(e) => { if (e.key === "Enter") handleRenameFolder(); }} />
@@ -498,12 +494,12 @@ export default function NotesPage() {
               <button onClick={() => setRenameTarget(null)}
                 className="flex-1 py-2.5 rounded-lg text-[17px] font-medium notes-font active:opacity-50"
                 style={{ color: "var(--color-amber)", background: "rgba(255,255,255,0.05)" }}>
-                キャンセル
+                {t("common.cancel")}
               </button>
               <button onClick={handleRenameFolder}
                 className="flex-1 py-2.5 rounded-lg text-[17px] font-bold notes-font active:opacity-50"
                 style={{ color: "#fff", background: "var(--color-amber)" }}>
-                保存
+                {t("common.save")}
               </button>
             </div>
           </div>

@@ -5,12 +5,15 @@ import { useTasks } from "@/hooks/useTasks";
 import { usePlans } from "@/hooks/usePlans";
 import { useCategories } from "@/hooks/useCategories";
 import { useEdgeSwipeBack } from "@/hooks/useEdgeSwipeBack";
-import { getTodayString, formatDateLabel, getTaskColor, getTaskColorMuted } from "@/lib/storage";
+import { useLocale } from "@/hooks/useLocale";
+import { getTodayString, getTaskColor, getTaskColorMuted } from "@/lib/storage";
+import { formatDateLabel } from "@/lib/i18n";
 
 export default function PlanPage() {
   const { tasks, loaded: tasksLoaded, deleteTasks } = useTasks();
   const { getPlan, saveDayPlan, toggleDone, loaded: plansLoaded } = usePlans();
   const { categories, groups } = useCategories();
+  const { locale, t } = useLocale();
 
   const today = getTodayString();
   const [selectedDate, setSelectedDate] = useState(today);
@@ -120,17 +123,17 @@ export default function PlanPage() {
         <header className="sticky top-0 z-40 border-b border-border header-gradient px-5 py-4 shadow-lg shadow-black/30">
           <p className="text-xs font-semibold italic text-amber tracking-wider">LIFER</p>
           <h1 className="text-xl font-bold text-text-primary tracking-tight">
-            予定を組む
+            {t("plan.title")}
           </h1>
           <p className="text-sm text-text-secondary mt-0.5">
-            日程を選んでください
+            {t("plan.selectDate")}
           </p>
         </header>
 
         <div className="flex flex-col gap-5 px-5 py-6">
           <div>
             <label className="block text-sm font-medium text-text-secondary mb-2">
-              日付
+              {t("plan.dateLabel")}
             </label>
             <input
               type="date"
@@ -145,20 +148,20 @@ export default function PlanPage() {
               onClick={() => setSelectedDate(today)}
               className="self-start rounded-xl bg-amber/15 px-4 py-2.5 text-sm font-medium text-amber"
             >
-              今日に戻す
+              {t("plan.backToToday")}
             </button>
           )}
 
           <div className="rounded-2xl bg-surface-elevated px-5 py-4 shadow-md shadow-black/25">
             <p className="text-lg font-bold text-text-primary">
-              {formatDateLabel(selectedDate)}
+              {formatDateLabel(selectedDate, locale)}
             </p>
             {plan ? (
               <p className="text-sm text-amber mt-1">
-                予定あり · {plan.entries.length}件のミッション
+                {t("plan.hasPlan", { count: plan.entries.length })}
               </p>
             ) : (
-              <p className="text-sm text-text-secondary mt-1">予定なし</p>
+              <p className="text-sm text-text-secondary mt-1">{t("plan.noPlan")}</p>
             )}
           </div>
 
@@ -168,14 +171,14 @@ export default function PlanPage() {
                 onClick={() => goForward("view")}
                 className="w-full rounded-2xl border border-amber bg-amber/10 py-4 text-base font-semibold text-amber shadow-md shadow-black/20"
               >
-                この日の予定を見る
+                {t("plan.viewPlan")}
               </button>
             )}
             <button
               onClick={() => goForward("select")}
               className="w-full rounded-2xl bg-amber py-4 text-base font-semibold text-white shadow-lg shadow-amber/20"
             >
-              {plan ? "ミッションを編集する" : "ミッションを選ぶ"}
+              {plan ? t("plan.editMissions") : t("plan.selectMissions")}
             </button>
           </div>
         </div>
@@ -197,7 +200,7 @@ export default function PlanPage() {
                 goBack("date");
               }}
               className="rounded-lg p-1 text-text-secondary"
-              aria-label="戻る"
+              aria-label={t("common.back")}
             >
               <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                 <polyline points="15 18 9 12 15 6" />
@@ -205,10 +208,10 @@ export default function PlanPage() {
             </button>
             <div>
               <h1 className="text-xl font-bold text-text-primary tracking-tight">
-                ミッションを選ぶ
+                {t("plan.selectMissions")}
               </h1>
               <p className="text-sm text-text-secondary mt-0.5">
-                {formatDateLabel(selectedDate)}
+                {formatDateLabel(selectedDate, locale)}
               </p>
             </div>
           </div>
@@ -216,8 +219,8 @@ export default function PlanPage() {
 
         {tasks.length === 0 ? (
           <div className="flex flex-col items-center gap-3 py-20 text-text-secondary animate-fade-in">
-            <p className="text-base">ミッションがありません</p>
-            <p className="text-sm">先にミッション一覧でミッションを追加してください</p>
+            <p className="text-base">{t("plan.noMissions")}</p>
+            <p className="text-sm">{t("plan.noMissionsHint")}</p>
           </div>
         ) : (
           <div className="flex flex-col gap-2 px-4 py-3">
@@ -274,12 +277,12 @@ export default function PlanPage() {
                         </span>
                         {catName && (
                           <span className="inline-block rounded-full bg-surface-highlight px-2.5 py-0.5 text-[11px] text-text-secondary">
-                            <span className="text-text-secondary/50">カテゴリ:</span> {catName}
+                            <span className="text-text-secondary/50">{t("plan.categoryLabel")}</span> {catName}
                           </span>
                         )}
                         {grpName && (
                           <span className="inline-block rounded-full bg-surface-highlight px-2.5 py-0.5 text-[11px] text-text-secondary">
-                            <span className="text-text-secondary/50">グループ:</span> {grpName}
+                            <span className="text-text-secondary/50">{t("plan.groupLabel")}</span> {grpName}
                           </span>
                         )}
                       </div>
@@ -294,19 +297,19 @@ export default function PlanPage() {
                         onClick={() => setDetailOpenId(task.id)}
                         className="shrink-0 rounded-lg bg-surface-highlight px-3 py-1.5 text-xs text-text-secondary"
                       >
-                        {noteText ? "詳細を編集" : "詳細を入力"}
+                        {noteText ? t("plan.editDetail") : t("plan.enterDetail")}
                       </button>
                     )}
                   </div>
                   {isSelected && isDetailOpen && (
                     <div className="mx-2 rounded-b-2xl bg-bg-secondary px-4 py-3 border border-t-0 border-border shadow-inner animate-slide-up">
                       <label className="block text-xs font-medium text-text-secondary mb-1.5">
-                        詳細
+                        {t("plan.detail")}
                       </label>
                       <textarea
                         value={noteText}
                         onChange={(e) => updateNote(task.id, e.target.value)}
-                        placeholder="詳細を入力..."
+                        placeholder={t("plan.detailPlaceholder")}
                         rows={4}
                         className="w-full resize-none rounded-xl border border-border bg-surface px-3 py-2.5 text-sm text-text-primary placeholder:text-text-secondary/50 focus:border-amber focus:outline-none leading-relaxed"
                         autoFocus
@@ -315,7 +318,7 @@ export default function PlanPage() {
                         onClick={() => setDetailOpenId(null)}
                         className="mt-2 w-full rounded-xl bg-amber/15 py-2 text-sm font-medium text-amber"
                       >
-                        閉じる
+                        {t("common.close")}
                       </button>
                     </div>
                   )}
@@ -331,7 +334,7 @@ export default function PlanPage() {
               onClick={handleSavePlan}
               className="w-full rounded-2xl bg-amber py-4 text-base font-semibold text-white transition-colors hover:bg-amber-dark shadow-lg shadow-amber/20"
             >
-              {selectedIds.size}件のミッションで予定を確定
+              {t("plan.confirmPlan", { count: selectedIds.size })}
             </button>
           </div>
         )}
@@ -348,7 +351,7 @@ export default function PlanPage() {
             <button
               onClick={() => goBack("date")}
               className="rounded-lg p-1 text-text-secondary"
-              aria-label="戻る"
+              aria-label={t("common.back")}
             >
               <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                 <polyline points="15 18 9 12 15 6" />
@@ -356,12 +359,12 @@ export default function PlanPage() {
             </button>
             <div>
               <h1 className="text-xl font-bold text-text-primary tracking-tight">
-                {formatDateLabel(selectedDate)}
+                {formatDateLabel(selectedDate, locale)}
               </h1>
               <p className="text-sm text-text-secondary mt-0.5">
                 {totalCount > 0
-                  ? `${doneCount}/${totalCount}件完了`
-                  : "予定なし"}
+                  ? t("plan.completedCount", { done: doneCount, total: totalCount })
+                  : t("plan.noPlan")}
               </p>
             </div>
           </div>
@@ -370,7 +373,7 @@ export default function PlanPage() {
               onClick={() => goForward("select")}
               className="rounded-xl border border-border px-4 py-2 text-sm text-text-secondary hover:text-text-primary transition-colors"
             >
-              編集
+              {t("common.edit")}
             </button>
           )}
         </div>
@@ -416,12 +419,12 @@ export default function PlanPage() {
                     </span>
                     {entry.categoryName && (
                       <span className="inline-block rounded-full bg-surface-highlight px-2.5 py-0.5 text-[11px] text-text-secondary">
-                        <span className="text-text-secondary/50">カテゴリ:</span> {entry.categoryName}
+                        <span className="text-text-secondary/50">{t("plan.categoryLabel")}</span> {entry.categoryName}
                       </span>
                     )}
                     {entry.groupName && (
                       <span className="inline-block rounded-full bg-surface-highlight px-2.5 py-0.5 text-[11px] text-text-secondary">
-                        <span className="text-text-secondary/50">グループ:</span> {entry.groupName}
+                        <span className="text-text-secondary/50">{t("plan.groupLabel")}</span> {entry.groupName}
                       </span>
                     )}
                   </div>
@@ -437,7 +440,7 @@ export default function PlanPage() {
           {doneCount > 0 && (
             <>
               <div className="px-4 py-2.5 text-xs font-bold uppercase tracking-widest text-text-secondary">
-                完了済み
+                {t("common.completed")}
               </div>
               {plan.entries
                 .filter((e) => e.isDone)
@@ -470,12 +473,12 @@ export default function PlanPage() {
                         </span>
                         {entry.categoryName && (
                           <span className="inline-block rounded-full bg-surface-highlight px-2.5 py-0.5 text-[11px] text-text-secondary/60">
-                            <span className="text-text-secondary/40">カテゴリ:</span> {entry.categoryName}
+                            <span className="text-text-secondary/40">{t("plan.categoryLabel")}</span> {entry.categoryName}
                           </span>
                         )}
                         {entry.groupName && (
                           <span className="inline-block rounded-full bg-surface-highlight px-2.5 py-0.5 text-[11px] text-text-secondary/60">
-                            <span className="text-text-secondary/40">グループ:</span> {entry.groupName}
+                            <span className="text-text-secondary/40">{t("plan.groupLabel")}</span> {entry.groupName}
                           </span>
                         )}
                       </div>
@@ -492,12 +495,12 @@ export default function PlanPage() {
         </div>
       ) : (
         <div className="flex flex-col items-center gap-3 py-20 text-text-secondary animate-fade-in">
-          <p className="text-base">この日の予定はまだありません</p>
+          <p className="text-base">{t("plan.noPlanYet")}</p>
           <button
             onClick={() => goForward("select")}
             className="mt-2 rounded-xl bg-amber/15 px-5 py-2.5 text-sm font-medium text-amber"
           >
-            ミッションを選ぶ
+            {t("plan.selectMissions")}
           </button>
         </div>
       )}

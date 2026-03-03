@@ -3,6 +3,7 @@
 import { memo } from "react";
 import { useSwipeActions } from "@/hooks/useSwipeActions";
 import type { NoteFolder } from "@/lib/storage";
+import { useLocale } from "@/hooks/useLocale";
 
 interface FolderCellProps {
   folder: NoteFolder;
@@ -15,6 +16,7 @@ interface FolderCellProps {
 export const FolderCell = memo(function FolderCell({
   folder, noteCount, onOpen, onDelete, onRename,
 }: FolderCellProps) {
+  const { t } = useLocale();
   const { contentRef, rightActionsRef, close, didSwipeRef } =
     useSwipeActions({ rightRevealWidth: 140 });
 
@@ -40,7 +42,7 @@ export const FolderCell = memo(function FolderCell({
             <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
             <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
           </svg>
-          名変更
+          {t("notes.rename")}
         </button>
         <button
           onClick={() => { onDelete(folder.id); close(); }}
@@ -51,7 +53,7 @@ export const FolderCell = memo(function FolderCell({
             <polyline points="3 6 5 6 21 6" />
             <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
           </svg>
-          削除
+          {t("common.delete")}
         </button>
       </div>
 
@@ -76,7 +78,7 @@ export const FolderCell = memo(function FolderCell({
             </p>
             <p className="text-[14px] notes-font mt-0.5"
               style={{ color: "var(--notes-secondary)" }}>
-              {noteCount}件
+              {t("notes.itemCount", { count: noteCount })}
             </p>
           </div>
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--notes-tertiary)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="shrink-0">

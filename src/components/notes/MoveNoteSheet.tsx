@@ -1,6 +1,7 @@
 "use client";
 
 import type { NoteFolder } from "@/lib/storage";
+import { useLocale } from "@/hooks/useLocale";
 
 interface MoveNoteSheetProps {
   noteId: string;
@@ -11,6 +12,7 @@ interface MoveNoteSheetProps {
 }
 
 export function MoveNoteSheet({ noteId, currentFolderId, folders, onMove, onClose }: MoveNoteSheetProps) {
+  const { t } = useLocale();
   return (
     <div className="fixed inset-0 z-[100] flex items-end justify-center" onClick={onClose}>
       <div className="absolute inset-0 bg-black/50 animate-fade-in" />
@@ -22,12 +24,12 @@ export function MoveNoteSheet({ noteId, currentFolderId, folders, onMove, onClos
         <div className="flex items-center justify-between px-5 py-4"
           style={{ borderBottom: "0.5px solid var(--notes-separator)" }}>
           <h2 className="text-[20px] font-bold notes-font" style={{ color: "var(--notes-primary)" }}>
-            フォルダを選択
+            {t("notes.selectFolder")}
           </h2>
           <button onClick={onClose}
             className="text-[17px] notes-font min-h-[44px] flex items-center px-2 active:opacity-50"
             style={{ color: "var(--color-amber)" }}>
-            キャンセル
+            {t("common.cancel")}
           </button>
         </div>
 
@@ -45,7 +47,7 @@ export function MoveNoteSheet({ noteId, currentFolderId, folders, onMove, onClos
               <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
               <polyline points="14 2 14 8 20 8" />
             </svg>
-            <span className="text-[17px] notes-font" style={{ color: "var(--notes-primary)" }}>未分類</span>
+            <span className="text-[17px] notes-font" style={{ color: "var(--notes-primary)" }}>{t("common.uncategorized")}</span>
             {!currentFolderId && (
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--color-amber)" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" className="ml-auto">
                 <polyline points="20 6 9 17 4 12" />

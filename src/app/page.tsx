@@ -3,6 +3,7 @@
 import { useState, useCallback } from "react";
 import { useTasks } from "@/hooks/useTasks";
 import { useCategories } from "@/hooks/useCategories";
+import { useLocale } from "@/hooks/useLocale";
 import { Task, getTaskColor, getTaskColorMuted } from "@/lib/storage";
 import SwipeableItem from "@/components/SwipeableItem";
 import AddItemSheet from "@/components/AddItemSheet";
@@ -32,6 +33,7 @@ export default function TaskListPage() {
     getSubGroups,
     getDescendantIds,
   } = useCategories();
+  const { t } = useLocale();
 
   const [showAdd, setShowAdd] = useState(false);
   const [addDefaultCatId, setAddDefaultCatId] = useState<string | undefined>();
@@ -150,13 +152,13 @@ export default function TaskListPage() {
                 onClick={() => setMoveTarget(task)}
                 className="rounded-xl bg-task-oneoff px-3 py-2 text-xs font-medium text-white"
               >
-                移動
+                {t("common.move")}
               </button>
               <button
                 onClick={() => deleteTask(task.id)}
                 className="rounded-xl bg-task-regular px-3 py-2 text-xs font-medium text-white"
               >
-                削除
+                {t("common.delete")}
               </button>
             </div>
           }
@@ -190,7 +192,7 @@ export default function TaskListPage() {
                   }}
                   className="text-base font-medium text-amber"
                 >
-                  保存
+                  {t("common.save")}
                 </button>
               </div>
             ) : (
@@ -274,7 +276,7 @@ export default function TaskListPage() {
             className="ml-auto text-text-secondary/40 hover:text-red-400 p-1.5"
           >
             {confirmDeleteId === groupId ? (
-              <span className="text-sm text-red-400">削除</span>
+              <span className="text-sm text-red-400">{t("common.delete")}</span>
             ) : (
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                 <path d="M3 6h18" /><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6" />
@@ -309,7 +311,7 @@ export default function TaskListPage() {
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                   <line x1="12" y1="5" x2="12" y2="19" /><line x1="5" y1="12" x2="19" y2="12" />
                 </svg>
-                ミッション
+                {t("missions.mission")}
               </button>
               <button
                 onClick={() => openQuickAdd("subgroup", catId, groupId, groupName)}
@@ -318,7 +320,7 @@ export default function TaskListPage() {
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                   <line x1="12" y1="5" x2="12" y2="19" /><line x1="5" y1="12" x2="19" y2="12" />
                 </svg>
-                サブグループ
+                {t("missions.subgroup")}
               </button>
             </div>
           </div>
@@ -378,7 +380,7 @@ export default function TaskListPage() {
             className="ml-auto text-text-secondary/40 hover:text-red-400 p-1.5"
           >
             {confirmDeleteId === catId ? (
-              <span className="text-sm text-red-400">削除</span>
+              <span className="text-sm text-red-400">{t("common.delete")}</span>
             ) : (
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                 <path d="M3 6h18" /><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6" />
@@ -413,7 +415,7 @@ export default function TaskListPage() {
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                   <line x1="12" y1="5" x2="12" y2="19" /><line x1="5" y1="12" x2="19" y2="12" />
                 </svg>
-                ミッション
+                {t("missions.mission")}
               </button>
               <button
                 onClick={() => openAdd("group", catId)}
@@ -422,7 +424,7 @@ export default function TaskListPage() {
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                   <line x1="12" y1="5" x2="12" y2="19" /><line x1="5" y1="12" x2="19" y2="12" />
                 </svg>
-                グループ
+                {t("common.group")}
               </button>
             </div>
           </div>
@@ -439,17 +441,17 @@ export default function TaskListPage() {
           <div>
             <p className="text-xs font-semibold italic text-amber tracking-wider">LIFER</p>
             <h1 className="text-xl font-bold text-text-primary tracking-tight">
-              ミッション一覧
+              {t("missions.title")}
             </h1>
             <p className="text-sm text-text-secondary mt-0.5">
-              {tasks.length}件のミッション
+              {t("missions.count", { count: tasks.length })}
             </p>
           </div>
           <div className="flex items-center gap-2">
             <button
               onClick={() => setShowDataTransfer(true)}
               className="flex h-10 w-10 items-center justify-center rounded-full bg-surface-highlight"
-              title="データ管理"
+              title={t("missions.dataManagement")}
             >
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-text-secondary">
                 <circle cx="12" cy="12" r="3" />
@@ -459,7 +461,7 @@ export default function TaskListPage() {
             <button
               onClick={toggleAll}
               className="flex h-10 w-10 items-center justify-center rounded-full bg-surface-highlight"
-              title={allExpanded ? "すべて閉じる" : "すべて開く"}
+              title={allExpanded ? t("missions.collapseAll") : t("missions.expandAll")}
             >
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-text-secondary">
                 {allExpanded ? (
@@ -511,8 +513,8 @@ export default function TaskListPage() {
             <path d="M13 12h4" />
             <path d="M13 16h4" />
           </svg>
-          <p className="text-base">ミッションがありません</p>
-          <p className="text-sm">右上の＋ボタンからミッションを追加してください</p>
+          <p className="text-base">{t("missions.empty")}</p>
+          <p className="text-sm">{t("missions.emptyHint")}</p>
         </div>
       ) : (
         <div className="flex flex-col gap-1 py-3 pb-8">
@@ -545,7 +547,7 @@ export default function TaskListPage() {
                   <polyline points="9 18 15 12 9 6" />
                 </svg>
                 <span className="text-lg font-bold text-text-secondary tracking-tight">
-                  未分類
+                  {t("common.uncategorized")}
                 </span>
                 <span className="rounded-full bg-surface-highlight px-2.5 py-0.5 text-sm text-text-secondary">
                   {uncategorized.length}
@@ -575,7 +577,7 @@ export default function TaskListPage() {
               <line x1="12" y1="5" x2="12" y2="19" />
               <line x1="5" y1="12" x2="19" y2="12" />
             </svg>
-            カテゴリを追加
+            {t("missions.addCategory")}
           </button>
         </div>
       )}

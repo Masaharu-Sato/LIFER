@@ -3,6 +3,7 @@
 import { useState, useMemo } from "react";
 import { Task, Category, Group } from "@/lib/storage";
 import BottomSheet from "./BottomSheet";
+import { useLocale } from "@/hooks/useLocale";
 
 interface FlatGroupOption {
   id: string;
@@ -44,6 +45,7 @@ export default function MoveTaskSheet({
   groups,
   onMove,
 }: MoveTaskSheetProps) {
+  const { t } = useLocale();
   const [categoryId, setCategoryId] = useState(task?.categoryId ?? "");
   const [groupId, setGroupId] = useState(task?.groupId ?? "");
 
@@ -67,12 +69,12 @@ export default function MoveTaskSheet({
     <BottomSheet
       isOpen={isOpen}
       onClose={onClose}
-      title={task ? `「${task.title}」を移動` : "移動"}
+      title={task ? t("moveTask.titleWithName", { name: task.title }) : t("moveTask.title")}
     >
       <div className="flex flex-col gap-4">
         <div>
           <label className="block text-xs font-medium text-text-secondary mb-1.5">
-            カテゴリ
+            {t("common.category")}
           </label>
           <select
             value={categoryId}
@@ -82,7 +84,7 @@ export default function MoveTaskSheet({
             }}
             className="w-full rounded-xl border border-border bg-bg-secondary px-4 py-3 text-base text-text-primary focus:border-amber focus:outline-none [color-scheme:dark]"
           >
-            <option value="">未分類</option>
+            <option value="">{t("common.uncategorized")}</option>
             {categories.map((c) => (
               <option key={c.id} value={c.id}>
                 {c.name}
@@ -94,14 +96,14 @@ export default function MoveTaskSheet({
         {categoryId && groupOptions.length > 0 && (
           <div>
             <label className="block text-xs font-medium text-text-secondary mb-1.5">
-              グループ
+              {t("common.group")}
             </label>
             <select
               value={groupId}
               onChange={(e) => setGroupId(e.target.value)}
               className="w-full rounded-xl border border-border bg-bg-secondary px-4 py-3 text-base text-text-primary focus:border-amber focus:outline-none [color-scheme:dark]"
             >
-              <option value="">グループなし</option>
+              <option value="">{t("common.noGroup")}</option>
               {groupOptions.map((g) => (
                 <option key={g.id} value={g.id}>
                   {g.label}
@@ -115,7 +117,7 @@ export default function MoveTaskSheet({
           onClick={handleMove}
           className="w-full rounded-xl bg-amber py-3.5 text-base font-semibold text-white transition-colors hover:bg-amber-dark mt-2"
         >
-          移動する
+          {t("moveTask.submit")}
         </button>
       </div>
     </BottomSheet>

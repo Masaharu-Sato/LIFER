@@ -3,6 +3,7 @@
 import { memo, useRef, useEffect, useCallback } from "react";
 import { loadNotes, saveNotes } from "@/lib/storage";
 import { useEdgeSwipeBack } from "@/hooks/useEdgeSwipeBack";
+import { useLocale } from "@/hooks/useLocale";
 
 /* ── Direct storage ops (bypass React state) ── */
 
@@ -30,6 +31,7 @@ interface NoteEditorProps {
 export const NoteEditor = memo(function NoteEditor({
   noteId, initTitle, initBody, onBack,
 }: NoteEditorProps) {
+  const { t } = useLocale();
   const titleEl = useRef<HTMLInputElement>(null);
   const bodyEl = useRef<HTMLTextAreaElement>(null);
   const scrollEl = useRef<HTMLDivElement>(null);
@@ -233,22 +235,22 @@ export const NoteEditor = memo(function NoteEditor({
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
             <polyline points="15 18 9 12 15 6" />
           </svg>
-          <span className="text-[17px] notes-font">メモ</span>
+          <span className="text-[17px] notes-font">{t("notes.title")}</span>
         </button>
         <button onClick={back}
           className="text-[17px] font-medium notes-font min-h-[44px] flex items-center px-4 active:opacity-50"
           style={{ color: "var(--color-amber)" }}>
-          完了
+          {t("common.done")}
         </button>
       </nav>
 
       <div ref={scrollEl} className="notes-scroll flex-1"
         style={{ overflowY: "auto", overflowX: "hidden", contain: "layout style paint", touchAction: "pan-y", overscrollBehaviorX: "none", overscrollBehaviorY: "auto" }}>
         <div className="px-4 pt-6 pb-40">
-          <input ref={titleEl} type="text" defaultValue={initTitle} placeholder="タイトル"
+          <input ref={titleEl} type="text" defaultValue={initTitle} placeholder={t("notes.titlePlaceholder")}
             className="w-full text-[28px] font-bold bg-transparent border-none outline-none notes-font"
             style={{ color: "var(--notes-primary)", caretColor: "var(--color-amber)" }} />
-          <textarea ref={bodyEl} defaultValue={initBody} placeholder="メモ"
+          <textarea ref={bodyEl} defaultValue={initBody} placeholder={t("notes.bodyPlaceholder")}
             className="w-full mt-3 text-[17px] leading-[1.47] bg-transparent border-none outline-none resize-none notes-font"
             style={{ color: "var(--notes-primary)", caretColor: "var(--color-amber)", minHeight: "300px", overflowX: "hidden", wordBreak: "break-word", overflowWrap: "anywhere" }} />
         </div>

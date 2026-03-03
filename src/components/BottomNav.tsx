@@ -2,11 +2,12 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useLocale } from "@/hooks/useLocale";
 
-const tabs = [
+const tabKeys = [
   {
     href: "/",
-    label: "ミッション",
+    labelKey: "nav.missions",
     icon: (
       <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
         <rect x="3" y="3" width="18" height="18" rx="2" />
@@ -19,7 +20,7 @@ const tabs = [
   },
   {
     href: "/today",
-    label: "予定を組む",
+    labelKey: "nav.plan",
     icon: (
       <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
         <rect x="3" y="4" width="18" height="16" rx="2" />
@@ -32,7 +33,7 @@ const tabs = [
   },
   {
     href: "/history",
-    label: "確認",
+    labelKey: "nav.history",
     icon: (
       <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
         <path d="M9 11l3 3L22 4" />
@@ -42,7 +43,7 @@ const tabs = [
   },
   {
     href: "/notes",
-    label: "メモ",
+    labelKey: "nav.notes",
     icon: (
       <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
         <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
@@ -56,11 +57,12 @@ const tabs = [
 
 export default function BottomNav() {
   const pathname = usePathname();
+  const { t } = useLocale();
 
   return (
     <nav className="fixed bottom-0 left-0 right-0 z-50 border-t border-border backdrop-blur-xl bg-surface/80 nav-safe-bottom shadow-[0_-4px_20px_rgba(0,0,0,0.4)]" style={{ touchAction: "pan-y" }}>
       <div className="mx-auto flex max-w-md">
-        {tabs.map((tab) => {
+        {tabKeys.map((tab) => {
           const isActive = pathname === tab.href;
           return (
             <Link
@@ -71,7 +73,7 @@ export default function BottomNav() {
               }`}
             >
               {tab.icon}
-              {tab.label}
+              {t(tab.labelKey)}
               {isActive && (
                 <span className="absolute bottom-2 h-1 w-1 rounded-full bg-amber" />
               )}

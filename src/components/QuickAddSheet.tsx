@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { TaskType } from "@/lib/storage";
 import BottomSheet from "./BottomSheet";
+import { useLocale } from "@/hooks/useLocale";
 
 interface QuickAddSheetProps {
   isOpen: boolean;
@@ -21,6 +22,7 @@ export default function QuickAddSheet({
   onAddTask,
   onAddSubGroup,
 }: QuickAddSheetProps) {
+  const { t } = useLocale();
   const [name, setName] = useState("");
   const [taskType, setTaskType] = useState<TaskType>("regular");
 
@@ -47,8 +49,8 @@ export default function QuickAddSheet({
   };
 
   const title = mode === "task"
-    ? `${groupName} にミッション追加`
-    : `${groupName} にサブグループ追加`;
+    ? t("quickAdd.addMission", { name: groupName })
+    : t("quickAdd.addSubgroup", { name: groupName });
 
   return (
     <BottomSheet isOpen={isOpen} onClose={onClose} title={title}>
@@ -57,7 +59,7 @@ export default function QuickAddSheet({
           type="text"
           value={name}
           onChange={(e) => setName(e.target.value)}
-          placeholder={mode === "task" ? "ミッション名" : "サブグループ名"}
+          placeholder={mode === "task" ? t("quickAdd.missionName") : t("quickAdd.subgroupName")}
           className="w-full rounded-xl border border-border bg-bg-secondary px-4 py-3.5 text-base text-text-primary placeholder:text-text-secondary/50 focus:border-amber focus:outline-none"
           autoFocus
         />
@@ -65,7 +67,7 @@ export default function QuickAddSheet({
         {mode === "task" && (
           <div>
             <label className="block text-xs font-medium text-text-secondary mb-1.5">
-              タイプ
+              {t("common.type")}
             </label>
             <div className="flex rounded-xl overflow-hidden border border-border">
               <button
@@ -99,7 +101,7 @@ export default function QuickAddSheet({
           disabled={!name.trim()}
           className="w-full rounded-xl bg-amber py-3.5 text-base font-semibold text-white transition-colors hover:bg-amber-dark disabled:opacity-40 mt-2"
         >
-          追加する
+          {t("common.addAction")}
         </button>
 
         <div className="h-10" />

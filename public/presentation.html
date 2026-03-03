@@ -1,0 +1,661 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LIFER - プレゼン資料</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700;900&display=swap');
+
+  :root {
+    --amber: #C8920A;
+    --amber-light: #DAA520;
+    --bg: #121212;
+    --bg-secondary: #1E1E1E;
+    --surface: #181818;
+    --surface-elevated: #1E1E1E;
+    --surface-highlight: #2A2A2A;
+    --text: #E8E8E8;
+    --text-secondary: #888888;
+    --blue: #3B82F6;
+    --red: #DC2626;
+    --blue-muted: #1E3A5F;
+    --red-muted: #5C1A1A;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html {
+    scroll-behavior: smooth;
+    scroll-snap-type: y mandatory;
+  }
+
+  body {
+    font-family: 'Noto Sans JP', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    overflow-x: hidden;
+  }
+
+  section {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 60px 40px;
+    scroll-snap-align: start;
+    position: relative;
+  }
+
+  .slide-inner {
+    max-width: 960px;
+    width: 100%;
+  }
+
+  /* ── Hero ── */
+  .hero {
+    text-align: center;
+    background: radial-gradient(ellipse at 50% 40%, rgba(200,146,10,0.12) 0%, transparent 70%);
+  }
+  .hero-badge {
+    display: inline-block;
+    font-size: 14px;
+    font-weight: 700;
+    letter-spacing: 3px;
+    color: var(--amber);
+    border: 1px solid rgba(200,146,10,0.3);
+    border-radius: 100px;
+    padding: 6px 20px;
+    margin-bottom: 32px;
+    text-transform: uppercase;
+  }
+  .hero h1 {
+    font-size: clamp(56px, 10vw, 96px);
+    font-weight: 900;
+    font-style: italic;
+    color: var(--amber);
+    letter-spacing: -2px;
+    line-height: 1;
+    margin-bottom: 24px;
+  }
+  .hero p.tagline {
+    font-size: clamp(18px, 3vw, 28px);
+    color: var(--text-secondary);
+    font-weight: 400;
+    margin-bottom: 48px;
+  }
+  .hero-features {
+    display: flex;
+    gap: 16px;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+  .hero-chip {
+    background: var(--surface-highlight);
+    border: 1px solid rgba(255,255,255,0.06);
+    border-radius: 12px;
+    padding: 12px 24px;
+    font-size: 15px;
+    font-weight: 500;
+    color: var(--text);
+  }
+  .scroll-hint {
+    position: absolute;
+    bottom: 32px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    color: var(--text-secondary);
+    font-size: 12px;
+    animation: bounce 2s infinite;
+  }
+  @keyframes bounce {
+    0%, 100% { transform: translateX(-50%) translateY(0); }
+    50% { transform: translateX(-50%) translateY(8px); }
+  }
+
+  /* ── Section headers ── */
+  .section-label {
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 3px;
+    color: var(--amber);
+    text-transform: uppercase;
+    margin-bottom: 12px;
+  }
+  .section-title {
+    font-size: clamp(32px, 5vw, 52px);
+    font-weight: 900;
+    letter-spacing: -1px;
+    line-height: 1.2;
+    margin-bottom: 16px;
+  }
+  .section-desc {
+    font-size: 17px;
+    color: var(--text-secondary);
+    line-height: 1.7;
+    max-width: 640px;
+    margin-bottom: 48px;
+  }
+
+  /* ── Problem / Solution ── */
+  .problem-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 32px;
+  }
+  .problem-card, .solution-card {
+    border-radius: 20px;
+    padding: 32px;
+  }
+  .problem-card {
+    background: linear-gradient(135deg, #1a0a0a, #1E1E1E);
+    border: 1px solid rgba(220,38,38,0.15);
+  }
+  .solution-card {
+    background: linear-gradient(135deg, #1a1505, #1E1E1E);
+    border: 1px solid rgba(200,146,10,0.15);
+  }
+  .problem-card h3 { color: #EF4444; font-size: 20px; margin-bottom: 16px; }
+  .solution-card h3 { color: var(--amber); font-size: 20px; margin-bottom: 16px; }
+  .problem-card ul, .solution-card ul {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+  .problem-card li, .solution-card li {
+    font-size: 15px;
+    color: var(--text-secondary);
+    padding-left: 24px;
+    position: relative;
+    line-height: 1.5;
+  }
+  .problem-card li::before {
+    content: "✕";
+    position: absolute;
+    left: 0;
+    color: #EF4444;
+    font-weight: 700;
+  }
+  .solution-card li::before {
+    content: "✓";
+    position: absolute;
+    left: 0;
+    color: var(--amber);
+    font-weight: 700;
+  }
+
+  /* ── 4 Tabs ── */
+  .tabs-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+  }
+  .tab-card {
+    background: var(--surface-elevated);
+    border: 1px solid rgba(255,255,255,0.06);
+    border-radius: 20px;
+    padding: 32px;
+    transition: transform 0.2s, border-color 0.2s;
+  }
+  .tab-card:hover {
+    transform: translateY(-4px);
+    border-color: rgba(200,146,10,0.3);
+  }
+  .tab-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 20px;
+    font-size: 22px;
+  }
+  .tab-icon.amber { background: rgba(200,146,10,0.15); }
+  .tab-icon.blue { background: rgba(59,130,246,0.15); }
+  .tab-icon.green { background: rgba(34,197,94,0.15); }
+  .tab-icon.purple { background: rgba(168,85,247,0.15); }
+  .tab-card h3 {
+    font-size: 20px;
+    font-weight: 700;
+    margin-bottom: 8px;
+  }
+  .tab-card p {
+    font-size: 14px;
+    color: var(--text-secondary);
+    line-height: 1.6;
+  }
+  .tab-tag {
+    display: inline-block;
+    font-size: 11px;
+    font-weight: 600;
+    background: var(--surface-highlight);
+    color: var(--text-secondary);
+    padding: 4px 10px;
+    border-radius: 6px;
+    margin-top: 12px;
+  }
+
+  /* ── Hierarchy ── */
+  .hierarchy-demo {
+    background: var(--surface-elevated);
+    border: 1px solid rgba(255,255,255,0.06);
+    border-radius: 20px;
+    padding: 32px;
+    max-width: 560px;
+    width: 100%;
+  }
+  .h-level {
+    border-radius: 12px;
+    padding: 14px 18px;
+    margin-bottom: 8px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 15px;
+    font-weight: 600;
+  }
+  .h-cat {
+    background: rgba(200,146,10,0.1);
+    border-left: 3px solid var(--amber);
+    color: var(--amber);
+  }
+  .h-grp {
+    background: rgba(255,255,255,0.04);
+    border-left: 3px solid var(--text-secondary);
+    margin-left: 24px;
+    color: var(--text);
+    font-weight: 500;
+  }
+  .h-sub {
+    background: rgba(255,255,255,0.03);
+    border-left: 3px solid rgba(255,255,255,0.15);
+    margin-left: 48px;
+    color: var(--text-secondary);
+    font-weight: 500;
+    font-size: 14px;
+  }
+  .h-task {
+    margin-left: 72px;
+    padding: 10px 16px;
+    border-radius: 10px;
+    font-weight: 500;
+    font-size: 13px;
+    color: white;
+  }
+  .h-task.regular { background: var(--red-muted); border-left: 3px solid var(--red); }
+  .h-task.oneoff { background: var(--blue-muted); border-left: 3px solid var(--blue); }
+  .type-badge {
+    font-size: 10px;
+    padding: 2px 8px;
+    border-radius: 100px;
+    margin-left: auto;
+    font-weight: 600;
+  }
+  .type-badge.regular { background: rgba(220,38,38,0.3); color: #FCA5A5; }
+  .type-badge.oneoff { background: rgba(59,130,246,0.3); color: #93C5FD; }
+
+  /* ── Workflow ── */
+  .workflow-steps {
+    display: flex;
+    gap: 24px;
+    align-items: stretch;
+  }
+  .workflow-step {
+    flex: 1;
+    background: var(--surface-elevated);
+    border: 1px solid rgba(255,255,255,0.06);
+    border-radius: 20px;
+    padding: 28px;
+    text-align: center;
+    position: relative;
+  }
+  .step-num {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: var(--amber);
+    color: #000;
+    font-weight: 900;
+    font-size: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 16px;
+  }
+  .workflow-step h4 {
+    font-size: 17px;
+    font-weight: 700;
+    margin-bottom: 8px;
+  }
+  .workflow-step p {
+    font-size: 13px;
+    color: var(--text-secondary);
+    line-height: 1.6;
+  }
+  .workflow-arrow {
+    display: flex;
+    align-items: center;
+    color: var(--amber);
+    font-size: 24px;
+    flex-shrink: 0;
+  }
+
+  /* ── Tech ── */
+  .tech-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+  }
+  .tech-item {
+    background: var(--surface-elevated);
+    border: 1px solid rgba(255,255,255,0.06);
+    border-radius: 16px;
+    padding: 24px;
+    text-align: center;
+  }
+  .tech-item .emoji {
+    font-size: 32px;
+    margin-bottom: 12px;
+  }
+  .tech-item h4 {
+    font-size: 15px;
+    font-weight: 700;
+    margin-bottom: 6px;
+  }
+  .tech-item p {
+    font-size: 12px;
+    color: var(--text-secondary);
+    line-height: 1.5;
+  }
+
+  /* ── CTA ── */
+  .cta-section {
+    text-align: center;
+    background: radial-gradient(ellipse at 50% 60%, rgba(200,146,10,0.1) 0%, transparent 70%);
+  }
+  .cta-url {
+    display: inline-block;
+    background: var(--amber);
+    color: #000;
+    font-weight: 700;
+    font-size: 18px;
+    padding: 16px 48px;
+    border-radius: 16px;
+    text-decoration: none;
+    margin-top: 40px;
+    transition: transform 0.2s, box-shadow 0.2s;
+  }
+  .cta-url:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 32px rgba(200,146,10,0.3);
+  }
+  .cta-sub {
+    font-size: 14px;
+    color: var(--text-secondary);
+    margin-top: 16px;
+  }
+
+  /* ── Footer ── */
+  .slide-footer {
+    position: absolute;
+    bottom: 24px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 12px;
+    color: var(--text-secondary);
+    opacity: 0.5;
+  }
+
+  /* ── Responsive ── */
+  @media (max-width: 768px) {
+    section { padding: 40px 20px; }
+    .problem-grid, .tabs-grid { grid-template-columns: 1fr; }
+    .workflow-steps { flex-direction: column; }
+    .workflow-arrow { justify-content: center; transform: rotate(90deg); }
+    .tech-grid { grid-template-columns: 1fr 1fr; }
+    .h-grp { margin-left: 16px; }
+    .h-sub { margin-left: 32px; }
+    .h-task { margin-left: 48px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ====== 1. Hero ====== -->
+<section class="hero">
+  <div class="slide-inner">
+    <div class="hero-badge">Mission Management Tool</div>
+    <h1>LIFER</h1>
+    <p class="tagline">ミッション管理 × デイリースケジュール × メモ<br>すべてを1つのアプリで。</p>
+    <div class="hero-features">
+      <div class="hero-chip">📋 ミッション管理</div>
+      <div class="hero-chip">📅 日次プランニング</div>
+      <div class="hero-chip">✅ 進捗トラッキング</div>
+      <div class="hero-chip">📝 メモ</div>
+    </div>
+  </div>
+  <div class="scroll-hint">
+    <span>SCROLL</span>
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+  </div>
+</section>
+
+<!-- ====== 2. Problem / Solution ====== -->
+<section>
+  <div class="slide-inner">
+    <div class="section-label">Why LIFER?</div>
+    <div class="section-title">既存ツールの課題を解決</div>
+    <div class="section-desc">タスク管理・スケジューリング・メモが別々のアプリに分散していませんか？</div>
+
+    <div class="problem-grid">
+      <div class="problem-card">
+        <h3>従来の課題</h3>
+        <ul>
+          <li>タスクとスケジュールが別アプリ</li>
+          <li>階層的な整理ができない</li>
+          <li>メモと予定が連携しない</li>
+          <li>オフラインで使えない</li>
+          <li>シンプルすぎるor複雑すぎる</li>
+        </ul>
+      </div>
+      <div class="solution-card">
+        <h3>LIFERの解決策</h3>
+        <ul>
+          <li>ミッション → 日次計画の一気通貫</li>
+          <li>カテゴリ/グループ/サブグループの3階層</li>
+          <li>メモ機能をアプリ内に統合</li>
+          <li>PWA対応でオフライン利用可能</li>
+          <li>必要十分な機能をミニマルUIで</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ====== 3. 4 Tabs ====== -->
+<section>
+  <div class="slide-inner">
+    <div class="section-label">Core Functions</div>
+    <div class="section-title">4つの機能</div>
+    <div class="section-desc">ボトムナビゲーションで瞬時にアクセス。</div>
+
+    <div class="tabs-grid">
+      <div class="tab-card">
+        <div class="tab-icon amber">📋</div>
+        <h3>ミッション</h3>
+        <p>すべてのタスクをカテゴリ・グループ・サブグループで階層的に管理。Regular/One-Offの2タイプに分類。スワイプで移動・削除。</p>
+        <span class="tab-tag">マスターリスト</span>
+      </div>
+      <div class="tab-card">
+        <div class="tab-icon blue">📅</div>
+        <h3>予定を組む</h3>
+        <p>日付を選択→ミッションを選択→メモを付けて保存。3ステップで1日のスケジュールを作成。One-Offタスクは計画後に自動削除。</p>
+        <span class="tab-tag">デイリープランニング</span>
+      </div>
+      <div class="tab-card">
+        <div class="tab-icon green">✅</div>
+        <h3>確認</h3>
+        <p>過去の予定をリスト表示。円形プログレスで達成率を可視化。タップでチェック・未チェックを切り替え。</p>
+        <span class="tab-tag">進捗トラッキング</span>
+      </div>
+      <div class="tab-card">
+        <div class="tab-icon purple">📝</div>
+        <h3>メモ</h3>
+        <p>Apple Notes風のメモ機能。フォルダ整理・ピン留め・全文検索・日付グルーピング。自動保存で入力中の消失を防止。</p>
+        <span class="tab-tag">ノートテイキング</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ====== 4. Hierarchy ====== -->
+<section>
+  <div class="slide-inner" style="display:flex; gap:64px; align-items:center; flex-wrap:wrap;">
+    <div style="flex:1; min-width:300px;">
+      <div class="section-label">Organization</div>
+      <div class="section-title">3階層の<br>ミッション管理</div>
+      <div class="section-desc" style="margin-bottom:24px;">
+        カテゴリ → グループ → サブグループの柔軟な階層構造。各レベルで折りたたみ表示・ミッション追加が可能。
+      </div>
+      <div style="display:flex; gap:12px; flex-wrap:wrap;">
+        <div style="display:flex; align-items:center; gap:8px;">
+          <span style="width:12px;height:12px;border-radius:3px;background:var(--red)"></span>
+          <span style="font-size:13px; color:var(--text-secondary)">Regular — 繰り返しタスク</span>
+        </div>
+        <div style="display:flex; align-items:center; gap:8px;">
+          <span style="width:12px;height:12px;border-radius:3px;background:var(--blue)"></span>
+          <span style="font-size:13px; color:var(--text-secondary)">One-Off — 一回限りのタスク</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="hierarchy-demo" style="flex:1; min-width:320px;">
+      <div class="h-level h-cat">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
+        仕事
+      </div>
+      <div class="h-level h-grp">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
+        プロジェクトA
+      </div>
+      <div class="h-level h-sub">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
+        フロントエンド
+      </div>
+      <div class="h-level h-task regular">
+        UI設計レビュー
+        <span class="type-badge regular">Regular</span>
+      </div>
+      <div class="h-level h-task oneoff">
+        バグ修正 #142
+        <span class="type-badge oneoff">One-Off</span>
+      </div>
+      <div class="h-level h-cat" style="margin-top:12px;">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
+        健康
+      </div>
+      <div class="h-level h-task regular" style="margin-left:24px;">
+        朝のジョギング
+        <span class="type-badge regular">Regular</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ====== 5. Workflow ====== -->
+<section>
+  <div class="slide-inner">
+    <div class="section-label">Daily Planning</div>
+    <div class="section-title">3ステップで予定を作成</div>
+    <div class="section-desc">ミッション一覧から今日やることを選ぶだけ。</div>
+
+    <div class="workflow-steps">
+      <div class="workflow-step">
+        <div class="step-num">1</div>
+        <h4>日付を選ぶ</h4>
+        <p>カレンダーから対象の日付を選択。デフォルトは今日。過去・未来の予定も作成可能。</p>
+      </div>
+      <div class="workflow-arrow">→</div>
+      <div class="workflow-step">
+        <div class="step-num">2</div>
+        <h4>ミッションを選ぶ</h4>
+        <p>マスターリストから実行するミッションをタップで選択。個別にメモを追加可能。</p>
+      </div>
+      <div class="workflow-arrow">→</div>
+      <div class="workflow-step">
+        <div class="step-num">3</div>
+        <h4>実行＆チェック</h4>
+        <p>保存した予定を確認画面でチェック。プログレスバーで達成率をリアルタイム表示。</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ====== 6. Tech Stack ====== -->
+<section>
+  <div class="slide-inner">
+    <div class="section-label">Technology</div>
+    <div class="section-title">技術構成</div>
+    <div class="section-desc">モダンなフロントエンド技術スタックで構築。</div>
+
+    <div class="tech-grid">
+      <div class="tech-item">
+        <div class="emoji">⚡</div>
+        <h4>Next.js 16</h4>
+        <p>App Router採用<br>最新のReact 19対応</p>
+      </div>
+      <div class="tech-item">
+        <div class="emoji">🎨</div>
+        <h4>Tailwind CSS v4</h4>
+        <p>ダークモード最適化<br>カスタムデザイントークン</p>
+      </div>
+      <div class="tech-item">
+        <div class="emoji">📱</div>
+        <h4>PWA</h4>
+        <p>ホーム画面に追加<br>オフライン対応</p>
+      </div>
+      <div class="tech-item">
+        <div class="emoji">💾</div>
+        <h4>localStorage</h4>
+        <p>サーバー不要<br>データは端末内に保存</p>
+      </div>
+      <div class="tech-item">
+        <div class="emoji">🔄</div>
+        <h4>データ移行</h4>
+        <p>JSON形式で<br>エクスポート/インポート</p>
+      </div>
+      <div class="tech-item">
+        <div class="emoji">🇯🇵</div>
+        <h4>日本語最適化</h4>
+        <p>Noto Serif JP<br>iOS操作感に準拠</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ====== 7. CTA ====== -->
+<section class="cta-section">
+  <div class="slide-inner" style="text-align:center;">
+    <div class="section-label">Get Started</div>
+    <div class="section-title">今すぐ始めよう</div>
+    <div class="section-desc" style="margin-left:auto; margin-right:auto;">
+      iPhoneのSafariでアクセスして「ホーム画面に追加」するだけ。<br>
+      アカウント登録不要。すべて無料。
+    </div>
+    <a class="cta-url" href="https://schedule-manager-eta.vercel.app" target="_blank">
+      LIFER を開く →
+    </a>
+    <p class="cta-sub">schedule-manager-eta.vercel.app</p>
+  </div>
+  <div class="slide-footer">LIFER — ミッション管理・1日のスケジュール作成ツール</div>
+</section>
+
+</body>
+</html>

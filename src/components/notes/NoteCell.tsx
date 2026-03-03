@@ -2,22 +2,11 @@
 
 import { memo } from "react";
 import { useSwipeActions } from "@/hooks/useSwipeActions";
+import { useLocale } from "@/hooks/useLocale";
+import { fmtNoteDate } from "@/lib/i18n";
 
-function fmtDate(s: string): string {
-  const d = new Date(s);
-  const now = new Date();
-  const t0 = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-  const td = new Date(d.getFullYear(), d.getMonth(), d.getDate());
-  const diff = Math.floor((t0.getTime() - td.getTime()) / 86400000);
-  if (diff === 0)
-    return d.toLocaleTimeString("ja-JP", { hour: "2-digit", minute: "2-digit" });
-  if (diff === 1) return "昨日";
-  if (diff < 7) return d.toLocaleDateString("ja-JP", { weekday: "short" });
-  return d.toLocaleDateString("ja-JP", { year: "numeric", month: "2-digit", day: "2-digit" });
-}
-
-function preview(body: string): string {
-  return body.split("\n").filter((l) => l.trim()).slice(0, 2).join(" ") || "追加テキストなし";
+function preview(body: string, fallback: string): string {
+  return body.split("\n").filter((l) => l.trim()).slice(0, 2).join(" ") || fallback;
 }
 
 interface NoteCellProps {
@@ -35,6 +24,7 @@ interface NoteCellProps {
 export const NoteCell = memo(function NoteCell({
   id, title, body, updatedAt, isPinned, onOpen, onDelete, onPin, onMove,
 }: NoteCellProps) {
+  const { locale, t } = useLocale();
   const { contentRef, leftActionsRef, rightActionsRef, close, didSwipeRef } =
     useSwipeActions({ leftRevealWidth: 70, rightRevealWidth: 140 });
 
@@ -63,7 +53,7 @@ export const NoteCell = memo(function NoteCell({
               <path d="M12 2l2.4 7.2H21l-5.4 3.9 2 7.2L12 16.2 6.4 20.3l2-7.2L3 9.2h6.6z" />
             )}
           </svg>
-          {isPinned ? "解除" : "ピン"}
+          {isPinned ? t("notes.unpin") : t("notes.pin")}
         </button>
       </div>
 
@@ -81,7 +71,7 @@ export const NoteCell = memo(function NoteCell({
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
             <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z" />
           </svg>
-          移動
+          {t("common.move")}
         </button>
         <button
           onClick={() => { onDelete(id); close(); }}
@@ -92,7 +82,7 @@ export const NoteCell = memo(function NoteCell({
             <polyline points="3 6 5 6 21 6" />
             <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
           </svg>
-          削除
+          {t("common.delete")}
         </button>
       </div>
 
@@ -112,17 +102,17 @@ export const NoteCell = memo(function NoteCell({
             )}
             <p className="text-[17px] font-semibold truncate notes-font leading-snug flex-1"
               style={{ color: "var(--notes-primary)" }}>
-              {title || "新規メモ"}
+              {title || t("notes.newNote")}
             </p>
           </div>
           <div className="flex items-baseline gap-2 mt-1">
             <span className="text-[14px] font-medium shrink-0 notes-font"
               style={{ color: "var(--notes-secondary)" }}>
-              {fmtDate(updatedAt)}
+              {fmtNoteDate(updatedAt, locale)}
             </span>
             <p className="text-[15px] truncate notes-font leading-snug"
               style={{ color: "var(--notes-tertiary)" }}>
-              {preview(body)}
+              {preview(body, t("notes.noAdditionalText"))}
             </p>
           </div>
         </div>

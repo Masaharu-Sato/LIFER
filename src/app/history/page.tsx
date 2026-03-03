@@ -3,10 +3,13 @@
 import { useState, useCallback } from "react";
 import { usePlans } from "@/hooks/usePlans";
 import { useEdgeSwipeBack } from "@/hooks/useEdgeSwipeBack";
-import { formatDateLabel, getTodayString, getTaskColor, getTaskColorMuted } from "@/lib/storage";
+import { useLocale } from "@/hooks/useLocale";
+import { getTodayString, getTaskColor, getTaskColorMuted } from "@/lib/storage";
+import { formatDateLabel } from "@/lib/i18n";
 
 export default function HistoryPage() {
   const { plans, loaded, deletePlan, toggleDone } = usePlans();
+  const { locale, t } = useLocale();
   const [selectedDate, setSelectedDate] = useState<string | null>(null);
   const [confirmDelete, setConfirmDelete] = useState(false);
   const [direction, setDirection] = useState<"forward" | "back">("forward");
@@ -52,7 +55,7 @@ export default function HistoryPage() {
               <button
                 onClick={goBack}
                 className="rounded-lg p-1 text-text-secondary"
-                aria-label="戻る"
+                aria-label={t("common.back")}
               >
                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                   <polyline points="15 18 9 12 15 6" />
@@ -60,10 +63,10 @@ export default function HistoryPage() {
               </button>
               <div>
                 <h1 className="text-xl font-bold text-text-primary tracking-tight">
-                  {formatDateLabel(selectedDate)}
+                  {formatDateLabel(selectedDate, locale)}
                 </h1>
                 <p className="text-sm text-text-secondary mt-0.5">
-                  {doneCount}/{totalCount}件完了
+                  {t("plan.completedCount", { done: doneCount, total: totalCount })}
                 </p>
               </div>
             </div>
@@ -109,12 +112,12 @@ export default function HistoryPage() {
                     </span>
                     {entry.categoryName && (
                       <span className="inline-block rounded-full bg-surface-highlight px-2.5 py-0.5 text-[11px] text-text-secondary">
-                        <span className="text-text-secondary/50">カテゴリ:</span> {entry.categoryName}
+                        <span className="text-text-secondary/50">{t("plan.categoryLabel")}</span> {entry.categoryName}
                       </span>
                     )}
                     {entry.groupName && (
                       <span className="inline-block rounded-full bg-surface-highlight px-2.5 py-0.5 text-[11px] text-text-secondary">
-                        <span className="text-text-secondary/50">グループ:</span> {entry.groupName}
+                        <span className="text-text-secondary/50">{t("plan.groupLabel")}</span> {entry.groupName}
                       </span>
                     )}
                   </div>
@@ -131,7 +134,7 @@ export default function HistoryPage() {
           {doneCount > 0 && (
             <>
               <div className="px-4 py-2.5 text-xs font-bold uppercase tracking-widest text-text-secondary">
-                完了済み
+                {t("common.completed")}
               </div>
               {selectedPlan.entries
                 .filter((e) => e.isDone)
@@ -164,12 +167,12 @@ export default function HistoryPage() {
                         </span>
                         {entry.categoryName && (
                           <span className="inline-block rounded-full bg-surface-highlight px-2.5 py-0.5 text-[11px] text-text-secondary/60">
-                            <span className="text-text-secondary/40">カテゴリ:</span> {entry.categoryName}
+                            <span className="text-text-secondary/40">{t("plan.categoryLabel")}</span> {entry.categoryName}
                           </span>
                         )}
                         {entry.groupName && (
                           <span className="inline-block rounded-full bg-surface-highlight px-2.5 py-0.5 text-[11px] text-text-secondary/60">
-                            <span className="text-text-secondary/40">グループ:</span> {entry.groupName}
+                            <span className="text-text-secondary/40">{t("plan.groupLabel")}</span> {entry.groupName}
                           </span>
                         )}
                       </div>
@@ -197,13 +200,13 @@ export default function HistoryPage() {
                 }}
                 className="flex-1 rounded-2xl bg-red-500/20 py-3 text-sm font-medium text-red-400"
               >
-                削除する
+                {t("history.deleteConfirm")}
               </button>
               <button
                 onClick={() => setConfirmDelete(false)}
                 className="flex-1 rounded-2xl border border-border py-3 text-sm text-text-secondary"
               >
-                キャンセル
+                {t("common.cancel")}
               </button>
             </div>
           ) : (
@@ -211,7 +214,7 @@ export default function HistoryPage() {
               onClick={() => setConfirmDelete(true)}
               className="w-full text-center text-sm text-text-secondary hover:text-red-400 transition-colors"
             >
-              この予定を削除
+              {t("history.deletePlan")}
             </button>
           )}
         </div>
@@ -228,12 +231,12 @@ export default function HistoryPage() {
       <header className="sticky top-0 z-40 border-b border-border header-gradient px-5 py-4 shadow-lg shadow-black/30">
         <p className="text-xs font-semibold italic text-amber tracking-wider">LIFER</p>
         <h1 className="text-xl font-bold text-text-primary tracking-tight">
-          確認
+          {t("history.title")}
         </h1>
         <p className="text-sm text-text-secondary mt-0.5">
           {plans.length > 0
-            ? `${plans.length}日分の予定`
-            : "まだ予定がありません"}
+            ? t("history.planCount", { count: plans.length })
+            : t("history.noPlans")}
         </p>
       </header>
 
@@ -253,9 +256,9 @@ export default function HistoryPage() {
             <path d="M9 11l3 3L22 4" />
             <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11" />
           </svg>
-          <p className="text-base">予定がありません</p>
+          <p className="text-base">{t("history.noPlansEmpty")}</p>
           <p className="text-sm">
-            「予定を組む」で予定を作成すると表示されます
+            {t("history.noPlansHint")}
           </p>
         </div>
       ) : (
@@ -280,16 +283,16 @@ export default function HistoryPage() {
                 <div className="flex-1">
                   <div className="flex items-center gap-2">
                     <p className="text-base font-bold text-text-primary">
-                      {formatDateLabel(plan.date)}
+                      {formatDateLabel(plan.date, locale)}
                     </p>
                     {isToday && (
                       <span className="rounded-md bg-amber/15 px-2 py-0.5 text-xs font-medium text-amber">
-                        今日
+                        {t("common.today")}
                       </span>
                     )}
                   </div>
                   <p className="text-sm text-text-secondary mt-0.5">
-                    {totalCount}件 · {doneCount}件完了
+                    {t("history.itemCount", { total: totalCount, done: doneCount })}
                   </p>
                 </div>
 
